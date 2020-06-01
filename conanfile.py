@@ -22,6 +22,7 @@ class ConanRecipe(ConanFile):
         "with_jack":  True
     }
     exports = ["FindPortaudio.cmake", "CMakeLists.txt"]
+    exports_sources = ["patches/*.diff"]
 
     def configure(self):
         del self.settings.compiler.libcxx
@@ -77,6 +78,8 @@ elif xcodebuild -version -sdk macosx10.14 Path >/dev/null 2>&1 ; then
 
 
     def build(self):
+        for p in self.conan_data["patches"][self.version]:
+            tools.patch(**p)
         self.patch_source()
 
         if self.settings.os == "Linux" or self.settings.os == "Macos":
@@ -100,6 +103,8 @@ elif xcodebuild -version -sdk macosx10.14 Path >/dev/null 2>&1 ; then
         else:
             cmake = CMake(self)
             cmake.definitions["MSVS"] = self.settings.compiler == "Visual Studio"
+            cmake.definitions["PA_BUILD_STATIC"] = not self.options.shared
+            cmake.definitions["PA_BUILD_SHARED"] = self.options.shared
             cmake.configure()
             cmake.build()
 
