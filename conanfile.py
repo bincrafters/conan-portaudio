@@ -146,4 +146,6 @@ elif xcodebuild -version -sdk macosx10.14 Path >/dev/null 2>&1 ; then
             self.cpp_info.system_libs.append('winmm')
 
         if self.settings.os == "Linux" and not self.options.shared:
-            self.cpp_info.system_libs.extend(['jack', 'm', 'pthread'])
+            self.cpp_info.system_libs.extend(['m', 'pthread'])
+            if self.options.with_jack:
+                self.cpp_info.system_libs.append('jack')
